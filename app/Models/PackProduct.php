@@ -9,7 +9,7 @@ class PackProduct extends Model
 {
     use HasFactory;
 
-    protected $table = 'pack_products';
+    protected $table = 'rose_pack_products';
 
     protected $guarded = [];
 
