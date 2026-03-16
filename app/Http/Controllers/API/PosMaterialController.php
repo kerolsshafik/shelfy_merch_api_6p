@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AgentVisits\addAttendanceRequest;
 use App\Http\Requests\PosMaterial\PosMaterialRequest;
 use App\Http\Requests\PosMaterial\PosRemoveImageRequest;
-use App\Http\Resources\AgentVisits\AttendanceResource;
+use App\Http\Requests\PosMaterial\PosmStoreImagesRequest;
 use App\Http\Resources\PosMaterial\PosMaterialResource;
-use App\Models\AgentAttendance;
+use App\Http\Resources\PosMaterial\PosmResource;
 use App\Models\MaterialImage;
 use App\Models\PosMaterial;
+use App\Models\Posm;
+use App\Models\PosmImage;
 use App\Traits\ApiResponseTrait;
 use App\Traits\ImageHandlingTrait;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class PosMaterialController extends Controller
 {
@@ -61,7 +60,7 @@ class PosMaterialController extends Controller
 
                 $images[] = [
                     'pos_material_id' => $material->id,
-                    'image_path'      => $this->saveImage($image, 'pos_material_images'),
+                    'image_path' => $this->saveImage($image, 'pos_material_images'),
                 ];
             }
             MaterialImage::insert($images);
@@ -69,6 +68,31 @@ class PosMaterialController extends Controller
 
         return $this->successResponse(
             new PosMaterialResource($material->load('images'))
+        );
+    }
+
+    public function addStoreImages(PosmStoreImagesRequest $request)
+    {
+        $posm = Posm::create([
+            'visit_id' => $request->input('visit_id'),
+            'store_id' => $request->input('store_id'),
+            'store_type' => $request->input('store_type'),
+        ]);
+
+        $imagesPayload = [];
+        foreach ($request->file('images') as $image) {
+            $imagesPayload[] = [
+                'pos_m_id' => $posm->id,
+                'image_path' => $this->saveImage($image, 'posm_store_images'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        PosmImage::insert($imagesPayload);
+
+        return $this->successResponse(
+            new PosmResource($posm->load('images'))
         );
     }
 

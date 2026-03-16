@@ -48,4 +48,19 @@ class Visit extends Model
     {
         return $this->hasMany(PosMaterial::class, 'visit_id', 'id');
     }
+
+    public function posMs()
+    {
+        return $this->hasMany(Posm::class, 'visit_id', 'id');
+    }
+
+    public function scanPackProducts()
+    {
+        return $this->hasMany(ScanPackProduct::class, 'visit_id', 'id');
+    }
+
+    public function scanPromotionProducts()
+    {
+        return $this->hasMany(ScanPromotionProduct::class, 'visit_id', 'id');
+    }
 }

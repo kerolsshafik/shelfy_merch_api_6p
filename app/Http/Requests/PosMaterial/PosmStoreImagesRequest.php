@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Agents;
+namespace App\Http\Requests\PosMaterial;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ScanPackRequest extends FormRequest
+class PosmStoreImagesRequest extends FormRequest
 {
     public function authorize()
     {
@@ -16,7 +16,9 @@ class ScanPackRequest extends FormRequest
         return [
             'visit_id' => 'required|exists:visits,id',
             'store_id' => 'required|exists:stores,id',
-            'barcode' => 'required|string',
+            'store_type' => 'required|in:0,1,2',
+            'images' => 'required|array|min:1',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 }

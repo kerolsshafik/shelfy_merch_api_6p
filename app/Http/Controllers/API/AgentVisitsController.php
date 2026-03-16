@@ -19,6 +19,8 @@ use App\Http\Resources\Products\ProductResource;
 use App\Models\PackProduct;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Models\ScanPackProduct;
+use App\Models\ScanPromotionProduct;
 use App\Models\Visit;
 use App\Models\VisitProductPrice;
 use App\Traits\ApiResponseTrait;
@@ -325,6 +327,15 @@ class AgentVisitsController extends Controller
             return $this->errorResponse('Barcode not found', 404);
         }
 
+        $visit = Visit::find($request->visit_id);
+        if (!$visit) {
+            return $this->errorResponse('Visit not found', 404);
+        }
+
+        if ((int) $visit->store_id !== (int) $request->store_id) {
+            return $this->errorResponse('Store does not match visit', 422);
+        }
+
         $isPack = PackProduct::where('product_id', $variation->product_id)
             ->where('is_pack', 1)
             ->exists();
@@ -337,6 +348,14 @@ class AgentVisitsController extends Controller
         if (!$product) {
             return $this->errorResponse('Product not found', 404);
         }
+
+        ScanPackProduct::create([
+            'visit_id' => $visit->id,
+            'store_id' => $request->store_id,
+            'product_id' => $variation->product_id,
+            'product_variation_id' => $variation->id,
+            'barcode' => $barcode,
+        ]);
 
         return $this->successResponse([
             'is_pack' => true,
@@ -352,6 +371,15 @@ class AgentVisitsController extends Controller
             return $this->errorResponse('Barcode not found', 404);
         }
 
+        $visit = Visit::find($request->visit_id);
+        if (!$visit) {
+            return $this->errorResponse('Visit not found', 404);
+        }
+
+        if ((int) $visit->store_id !== (int) $request->store_id) {
+            return $this->errorResponse('Store does not match visit', 422);
+        }
+
         $isPack = PackProduct::where('product_id', $variation->product_id)
             ->where('is_promotion', 1)
             ->exists();
@@ -364,6 +392,14 @@ class AgentVisitsController extends Controller
         if (!$product) {
             return $this->errorResponse('Product not found', 404);
         }
+
+        ScanPromotionProduct::create([
+            'visit_id' => $visit->id,
+            'store_id' => $request->store_id,
+            'product_id' => $variation->product_id,
+            'product_variation_id' => $variation->id,
+            'barcode' => $barcode,
+        ]);
 
         return $this->successResponse([
             'is_promotion' => true,
