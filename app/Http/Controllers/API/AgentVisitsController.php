@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Agents\ScanPackRequest;
 use App\Http\Requests\AgentVisits\AddVisitItemRequest;
 use App\Http\Requests\AgentVisits\CancelVisitCycleRequest;
 use App\Http\Requests\AgentVisits\GetVisitDataRequest;
 use App\Http\Requests\AgentVisits\RemoveReturnRequest;
+use App\Http\Requests\AgentVisits\ScanPackRequest;
 use App\Http\Requests\AgentVisits\StartVisitRequest;
 use App\Http\Requests\AgentVisits\StoreVisitProductPriceRequest;
 use App\Http\Requests\AgentVisits\VisitOsaRequest;

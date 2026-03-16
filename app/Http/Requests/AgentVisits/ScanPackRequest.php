@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Agents;
-
+namespace App\Http\Requests\AgentVisits;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ScanPackRequest extends FormRequest
