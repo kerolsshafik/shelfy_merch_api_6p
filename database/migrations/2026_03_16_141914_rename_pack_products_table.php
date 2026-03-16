@@ -13,11 +13,13 @@ class RenamePackProductsTable extends Migration
      */
     public function up(): void
     {
-        Schema::rename('pack_products', 'rose_pack_products');
+
+        Schema::connection('mysql')->rename('pack_products', 'rose_pack_products');
     }
 
     public function down(): void
     {
-        Schema::rename('rose_pack_products', 'pack_products');
+        Schema::connection('mysql')
+            ->rename('rose_pack_products', 'pack_products');
     }
 }
