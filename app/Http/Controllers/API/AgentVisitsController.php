@@ -3,18 +3,24 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Agents\ScanPackRequest;
 use App\Http\Requests\AgentVisits\AddVisitItemRequest;
 use App\Http\Requests\AgentVisits\CancelVisitCycleRequest;
 use App\Http\Requests\AgentVisits\GetVisitDataRequest;
 use App\Http\Requests\AgentVisits\RemoveReturnRequest;
 use App\Http\Requests\AgentVisits\StartVisitRequest;
+use App\Http\Requests\AgentVisits\StoreVisitProductPriceRequest;
 use App\Http\Requests\AgentVisits\VisitOsaRequest;
 use App\Http\Requests\AgentVisits\VisitReturnsRequest;
 use App\Http\Resources\AgentVisits\VisitOsaResource;
 use App\Http\Resources\AgentVisits\VisitReturnsResource;
 use App\Http\Resources\AgentVisits\VisitsResource;
+use App\Http\Resources\Products\ProductResource;
+use App\Models\PackProduct;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Models\Visit;
+use App\Models\VisitProductPrice;
 use App\Traits\ApiResponseTrait;
 use App\Traits\ImageHandlingTrait;
 use Illuminate\Http\Request;
@@ -268,5 +274,100 @@ class AgentVisitsController extends Controller
         $visit->start_time = null;
         $visit->save();
         return $this->successResponse([], 'Visit cancelled successfully');
+    }
+    public function storeVisitProductPrice(StoreVisitProductPriceRequest $request)
+    {
+        $visit = Visit::find($request->visit_id);
+        if (!$visit) {
+            return $this->errorResponse('Visit not found', 404);
+        }
+
+        if ((int) $visit->store_id !== (int) $request->store_id) {
+            return $this->errorResponse('store_id does not match this visit', 422);
+        }
+        // barcode
+        $barcode = $request->barcode;
+        $variation = ProductVariation::where('barcode', $barcode)->first();
+        if (!$variation) {
+            return $this->errorResponse('Barcode not found', 404);
+        }
+
+        $isPack = PackProduct::where('product_id', $variation->product_id)
+            ->where('is_pack', 1)
+            ->exists();
+
+        if (!$isPack) {
+            return $this->errorResponse('This product is not a pack', 404);
+        }
+
+
+        $price = VisitProductPrice::updateOrCreate(
+            [
+                'visit_id' => (int) $request->visit_id,
+                'store_id' => (int) $request->store_id,
+                'product_id' => (int) $variation->product_id,
+            ],
+            [
+                'price' => (float) $request->price,
+            ]
+        );
+
+        return $this->successResponse($price, 'Visit product price saved successfully', 200);
+    }
+
+
+    public function scanPack(ScanPackRequest $request)
+    {
+        $barcode = trim((string) $request->barcode);
+
+        $variation = ProductVariation::where('barcode', $barcode)->first();
+        if (!$variation) {
+            return $this->errorResponse('Barcode not found', 404);
+        }
+
+        $isPack = PackProduct::where('product_id', $variation->product_id)
+            ->where('is_pack', 1)
+            ->exists();
+
+        if (!$isPack) {
+            return $this->errorResponse('This product is not a pack', 404);
+        }
+
+        $product = Product::with(['standard', 'category'])->find($variation->product_id);
+        if (!$product) {
+            return $this->errorResponse('Product not found', 404);
+        }
+
+        return $this->successResponse([
+            'is_pack' => true,
+            'product' => new ProductResource($product),
+        ], 'Pack product found', 200);
+    }
+    public function scanPromotion(ScanPackRequest $request)
+    {
+        $barcode = trim((string) $request->barcode);
+
+        $variation = ProductVariation::where('barcode', $barcode)->first();
+        if (!$variation) {
+            return $this->errorResponse('Barcode not found', 404);
+        }
+
+        $isPack = PackProduct::where('product_id', $variation->product_id)
+            ->where('is_promotion', 1)
+            ->exists();
+
+        if (!$isPack) {
+            return $this->errorResponse('This product is not a pack', 404);
+        }
+
+        $product = Product::with(['standard', 'category'])->find($variation->product_id);
+        if (!$product) {
+            return $this->errorResponse('Product not found', 404);
+        }
+
+        return $this->successResponse([
+            'is_promotion' => true,
+            'product' => new ProductResource($product),
+        ], 'Pack product found', 200);
     }
 }
