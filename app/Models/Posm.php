@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Posm extends Model
 {
     use HasFactory;
-
+    protected $table = 'pos_ms';
     protected $fillable = ['visit_id', 'store_id', 'store_type'];
 
     public function visit()
