@@ -13,7 +13,7 @@ class CreateVisitProductPriceTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql2')->create('rose_visit_product_prices', function (Blueprint $table) {
+        Schema::connection('mysql')->create('rose_visit_product_prices', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('visit_id');
             $table->unsignedBigInteger('store_id');
