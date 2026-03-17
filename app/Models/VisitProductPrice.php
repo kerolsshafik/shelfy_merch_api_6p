@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class VisitProductPrice extends Model
 {
     use HasFactory;
-    protected $table = 'visit_item_product';
+
+    protected $guarded = [];
+
+    // Explicitly defining the table name ignores the global 'prefix' config automatically.
+    protected $table = 'visit_product_price';
 
     public function visit()
     {
@@ -25,4 +29,3 @@ class VisitProductPrice extends Model
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
 }
-
