@@ -134,9 +134,12 @@ Route::middleware(['auth:api', 'customer.expired'])->group(function () {
         Route::post('/attendance', [AttendanceController::class, 'addAttendance']);
         Route::post('/pos/material', [PosMaterialController::class, 'addMaterial']);
         Route::delete('/pos/remove/image', [PosMaterialController::class, 'removePosImage']);
-        Route::post('/pos/store/images', [PosMaterialController::class, 'addStoreImages']);
         Route::post('/product/price', [AgentVisitsController::class, 'storeVisitProductPrice']);
         Route::post('/scan/pack', [AgentVisitsController::class, 'scanPack']);
+        Route::get('/scan', [AgentVisitsController::class, 'scan']);
         Route::post('/scan/promotion', [AgentVisitsController::class, 'scanPromotion']);
+        Route::post('/categoty/shelf/persentage', [AgentVisitsController::class, 'shelfPersentage']);
+        Route::post('/pos/store/images', [PosMaterialController::class, 'addStoreImages']);
+
     });
 });

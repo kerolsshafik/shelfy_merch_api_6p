@@ -8,6 +8,7 @@ use App\Http\Requests\AgentVisits\CancelVisitCycleRequest;
 use App\Http\Requests\AgentVisits\GetVisitDataRequest;
 use App\Http\Requests\AgentVisits\RemoveReturnRequest;
 use App\Http\Requests\AgentVisits\ScanPackRequest;
+use App\Http\Requests\AgentVisits\ShelfPercentageRequest;
 use App\Http\Requests\AgentVisits\StartVisitRequest;
 use App\Http\Requests\AgentVisits\StoreVisitProductPriceRequest;
 use App\Http\Requests\AgentVisits\VisitOsaRequest;
@@ -16,6 +17,7 @@ use App\Http\Resources\AgentVisits\VisitOsaResource;
 use App\Http\Resources\AgentVisits\VisitReturnsResource;
 use App\Http\Resources\AgentVisits\VisitsResource;
 use App\Http\Resources\Products\ProductResource;
+use App\Models\Category;
 use App\Models\PackProduct;
 use App\Models\Product;
 use App\Models\ProductVariation;
@@ -23,6 +25,7 @@ use App\Models\ScanPackProduct;
 use App\Models\ScanPromotionProduct;
 use App\Models\Visit;
 use App\Models\VisitProductPrice;
+use App\Models\CategoryShelfPercentage;
 use App\Traits\ApiResponseTrait;
 use App\Traits\ImageHandlingTrait;
 use Illuminate\Http\Request;
@@ -317,6 +320,22 @@ class AgentVisitsController extends Controller
         return $this->successResponse($price, 'Visit product price saved successfully', 200);
     }
 
+    public function scan(Request $request)
+    {
+        $barcode = trim((string) $request->barcode);
+
+        $variation = ProductVariation::where('barcode', $barcode)->first();
+        if (!$variation) {
+            return $this->errorResponse('Barcode not found', 404);
+        }
+
+        $product = Product::with(['standard', 'category'])->find($variation->product_id);
+        if (!$product) {
+            return $this->errorResponse('Product not found', 404);
+        }
+        return $this->successResponse($product, 'Product returned successfully', 200);
+    }
+
 
     public function scanPack(ScanPackRequest $request)
     {
@@ -405,5 +424,62 @@ class AgentVisitsController extends Controller
             'is_promotion' => true,
             'product' => new ProductResource($product),
         ], 'Pack product found', 200);
+    }
+
+    public function shelfPersentage(ShelfPercentageRequest $request)
+    {
+        $visit = Visit::find($request->visit_id);
+        if (!$visit) {
+            return $this->errorResponse('Visit not found', 404);
+        }
+
+        if ((int) $visit->store_id !== (int) $request->store_id) {
+            return $this->errorResponse('store_id does not match this visit', 422);
+        }
+
+        $inputCategories = collect($request->input('categories', []));
+        $categoryIds = $inputCategories->pluck('category_id')->unique();
+        $categories = Category::whereIn('category_id', $categoryIds)->get()->keyBy('category_id');
+
+        $missing = $categoryIds->diff($categories->keys());
+        if ($missing->isNotEmpty()) {
+            return $this->errorResponse('Some categories are not valid', 422);
+        }
+
+        $parentCategories = $categories->filter(fn($category) => empty($category->parent));
+        if ($parentCategories->count() > 1) {
+            return $this->errorResponse('Only one parent category can be submitted', 422);
+        }
+
+        if ($parentCategories->count() === 1 && $inputCategories->count() > 1) {
+            return $this->errorResponse('Parent category must be submitted on its own', 422);
+        }
+
+        CategoryShelfPercentage::where('visit_id', $visit->id)
+            ->where('store_id', $visit->store_id)
+            ->delete();
+
+        $payload = $inputCategories->map(function ($item) use ($categories, $visit) {
+            $category = $categories->get($item['category_id']);
+            return [
+                'visit_id' => $visit->id,
+                'store_id' => $visit->store_id,
+                'category_id' => $item['category_id'],
+                'percentage' => (float) $item['percentage'],
+                'is_parent' => empty($category->parent) ? 1 : 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        })->toArray();
+
+        if (!empty($payload)) {
+            CategoryShelfPercentage::insert($payload);
+        }
+
+        $saved = CategoryShelfPercentage::where('visit_id', $visit->id)
+            ->where('store_id', $visit->store_id)
+            ->get();
+
+        return $this->successResponse($saved, 'Shelf percentages saved successfully');
     }
 }
