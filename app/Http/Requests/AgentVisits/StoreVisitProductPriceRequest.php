@@ -14,8 +14,8 @@ class StoreVisitProductPriceRequest extends FormRequest
     public function rules()
     {
         return [
-            'visit_id' => ['required', 'integer', 'exists:mysql.visits,id'],
-            'store_id' => ['required', 'integer', 'exists:mysql.stores,id'],
+            'visit_id' => ['required', 'integer', 'exists:visits,id'],
+            'store_id' => ['required', 'integer', 'exists:stores,id'],
             'barcode' => ['required', 'integer'],
             'price' => ['required', 'numeric', 'min:0'],
         ];
