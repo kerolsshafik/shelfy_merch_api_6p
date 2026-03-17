@@ -12,7 +12,7 @@ class VisitProductPrice extends Model
     protected $guarded = [];
 
     // Explicitly defining the table name ignores the global 'prefix' config automatically.
-    protected $table = 'visit_product_prices';
+    protected $table = 'rose_visit_product_prices';
 
     public function visit()
     {
