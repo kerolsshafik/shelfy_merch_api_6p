@@ -29,7 +29,6 @@ use App\Models\CategoryShelfPercentage;
 use App\Traits\ApiResponseTrait;
 use App\Traits\ImageHandlingTrait;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AgentVisitsController extends Controller
 {
@@ -319,7 +318,7 @@ class AgentVisitsController extends Controller
         }
 
 
-        $price = DB::connection('mysql')->table('visit_product_price')->updateOrInsert(
+        $price = VisitProductPrice::updateOrCreate(
             [
                 'visit_id' => (int) $request->visit_id,
                 'store_id' => (int) $request->store_id,
@@ -327,7 +326,6 @@ class AgentVisitsController extends Controller
             ],
             [
                 'price' => (float) $request->price,
-                'updated_at' => now(), // ⚠️ Manual timestamp handling
             ]
         );
 
