@@ -117,7 +117,8 @@ class CategoryController extends Controller
             $page = $request->page;
         }
         $user_id = Auth::id();
-        $categoryIds = \DB::table('category_customer')->where('customer_id', $user_id)->pluck('category_id')->toArray();
+        $store_id = $request->store_id ?? 1;
+        $categoryIds = \DB::table('category_customer')->where('customer_id', $store_id)->pluck('category_id')->toArray();
         $categories = Category::where(function ($query) use ($request) {
             $query->where('name_ar', 'LIKE', '%' . $request->search . '%')
                 ->orWhere('title', 'LIKE', '%' . $request->search . '%');
