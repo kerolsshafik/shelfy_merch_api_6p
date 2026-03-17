@@ -294,7 +294,7 @@ class AgentVisitsController extends Controller
     }
     public function storeVisitProductPrice(StoreVisitProductPriceRequest $request)
     {
-        $visit = Visit::find($request->visit_id);
+        $visit = Visit::where('id', $request->visit_id)->first();
         if (!$visit) {
             return $this->errorResponse('Visit not found', 404);
         }
