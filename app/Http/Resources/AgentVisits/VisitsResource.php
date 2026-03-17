@@ -2,7 +2,10 @@
 
 namespace App\Http\Resources\AgentVisits;
 
+use App\Http\Resources\AgentVisits\ScanPackProductResource;
+use App\Http\Resources\AgentVisits\ScanPromotionProductResource;
 use App\Http\Resources\PosMaterial\PosMaterialResource;
+use App\Http\Resources\PosMaterial\PosmResource;
 use App\Http\Resources\Stores\StoresResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,10 +19,10 @@ class VisitsResource extends JsonResource
      */
     public function toArray($request)
     {
-        
+
         return [
             'id' => $this->id,
-            'store' =>  StoresResource::make($this->store),
+            'store' => StoresResource::make($this->store),
             'is_must' => $this->is_must,
             'order' => $this->order,
             'is_disabled' => $this->end_time != null ? true : false,
@@ -34,6 +37,10 @@ class VisitsResource extends JsonResource
             'pos_materials' => PosMaterialResource::collection($this->whenLoaded('posMaterials')),
             'visit_osa' => VisitOsaResource::collection($this->whenLoaded('osaVisits')),
             'visit_grouped_items' => VisitItemResource::collection($this->whenLoaded('visitItems')),
+            'scanPackProducts' => ScanPackProductResource::collection($this->whenLoaded('scanPackProducts')),
+            'scanPromotionProducts' => ScanPromotionProductResource::collection($this->whenLoaded('scanPromotionProducts')),
+            'posMs' => PosmResource::collection($this->whenLoaded('posMs')),
+
         ];
     }
 }

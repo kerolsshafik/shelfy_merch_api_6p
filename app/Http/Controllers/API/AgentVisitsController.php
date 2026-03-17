@@ -256,7 +256,19 @@ class AgentVisitsController extends Controller
 
     public function getVisitData(GetVisitDataRequest $request)
     {
-        $visit = Visit::with('agentAttendances', 'returnItems', 'store', 'posMaterials.images', 'visitItems.VisitItemProducts.product', 'osaVisits')->where('id', $request->visit_id)->first();
+        $visit = Visit::with([
+            'agentAttendances',
+            'returnItems',
+            'store',
+            'posMaterials.images',
+            'visitItems.VisitItemProducts.product',
+            'scanPackProducts.product',
+            'scanPackProducts.variation',
+            'posMs.images',
+            'scanPromotionProducts.product',
+            'scanPromotionProducts.variation',
+            'osaVisits',
+        ])->where('id', $request->visit_id)->first();
         $resource = new VisitsResource($visit);
         return $this->successResponse($resource, 'Visit data returned successfully');
     }
@@ -381,6 +393,35 @@ class AgentVisitsController extends Controller
             'product' => new ProductResource($product),
         ], 'Pack product found', 200);
     }
+    // removePack
+    public function removePack(Request $request)
+    {
+        $visit = Visit::find($request->visit_id);
+        if (!$visit) {
+            return $this->errorResponse('Visit not found', 404);
+        }
+
+        if ((int) $visit->store_id !== (int) $request->store_id) {
+            return $this->errorResponse('Store does not match visit', 422);
+        }
+
+        $isPack = PackProduct::where('product_id', $request->product_id)
+            ->where('is_pack', 1)
+            ->exists();
+
+        if (!$isPack) {
+            return $this->errorResponse('This product is not a pack', 404);
+        }
+        $pack = ScanPackProduct::where('product_id', $request->product_id)
+            ->where('store_id', $request->store_id)
+            ->where('visit_id', $visit->id)->first();
+        if (!$pack) {
+            return $this->errorResponse('Pack not found', 404);
+        }
+        $pack->delete();
+        return $this->successResponse([], 'Pack removed successfully', 200);
+    }
+
     public function scanPromotion(ScanPackRequest $request)
     {
         $barcode = trim((string) $request->barcode);

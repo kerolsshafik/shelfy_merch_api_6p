@@ -136,6 +136,7 @@ Route::middleware(['auth:api', 'customer.expired'])->group(function () {
         Route::delete('/pos/remove/image', [PosMaterialController::class, 'removePosImage']);
         Route::post('/product/price', [AgentVisitsController::class, 'storeVisitProductPrice']);
         Route::post('/scan/pack', [AgentVisitsController::class, 'scanPack']);
+        Route::post('/remove/pack', [PosMaterialController::class, 'removePack']);
         Route::get('/scan', [AgentVisitsController::class, 'scan']);
         Route::post('/scan/promotion', [AgentVisitsController::class, 'scanPromotion']);
         Route::post('/categoty/shelf/persentage', [AgentVisitsController::class, 'shelfPersentage']);
