@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class VisitProductPrice extends Model
 {
     use HasFactory;
-    protected $table = 'visit_product_prices';
+    protected $table = 'rose_visit_item_product';
 
     public function visit()
     {
