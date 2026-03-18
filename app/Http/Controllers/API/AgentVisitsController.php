@@ -269,6 +269,7 @@ class AgentVisitsController extends Controller
             'scanPromotionProducts.variation',
             'osaVisits',
             'productPrices.product',
+            'shelfPercentage',
         ])->where('id', $request->visit_id)->first();
         $resource = new VisitsResource($visit);
         return $this->successResponse($resource, 'Visit data returned successfully');

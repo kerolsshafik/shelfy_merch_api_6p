@@ -67,4 +67,9 @@ class Visit extends Model
     {
         return $this->hasMany(VisitProductPrice::class, 'visit_id', 'id');
     }
+    // CategoryShelfPercentage
+    public function shelfPercentage()
+    {
+        return $this->hasMany(CategoryShelfPercentage::class, 'visit_id', 'id');
+    }
 }
