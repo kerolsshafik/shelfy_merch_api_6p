@@ -63,4 +63,8 @@ class Visit extends Model
     {
         return $this->hasMany(ScanPromotionProduct::class, 'visit_id', 'id');
     }
+    public function productPrices()
+    {
+        return $this->hasMany(VisitProductPrice::class, 'visit_id', 'id');
+    }
 }

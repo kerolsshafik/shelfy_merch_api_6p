@@ -81,7 +81,7 @@ class PosMaterialController extends Controller
 
         $imagesPayload = [];
         foreach ($request->file('images') as $image) {
-            $imagesPayload[] = [ 
+            $imagesPayload[] = [
                 'pos_m_id' => $posm->id,
                 'image_path' => $this->saveImage($image, 'posm_store_images'),
                 'created_at' => now(),
