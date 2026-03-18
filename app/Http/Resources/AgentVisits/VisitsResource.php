@@ -41,8 +41,7 @@ class VisitsResource extends JsonResource
             'scanPromotionProducts' => ScanPromotionProductResource::collection($this->whenLoaded('scanPromotionProducts')),
             'posMs' => PosmResource::collection($this->whenLoaded('posMs')),
             'productPrices' => ProductPriceResource::collection($this->whenLoaded('productPrices.Product')),
-
-
         ];
+        
     }
 }
