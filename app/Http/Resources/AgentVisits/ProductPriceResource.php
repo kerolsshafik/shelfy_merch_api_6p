@@ -19,7 +19,7 @@ class ProductPriceResource extends JsonResource
             'id' => $this->id,
             'visit_id' => $this->visit_id,
             'product' => new ProductResource($this->whenLoaded('product')),
-            
+            'product_id' => $this->product_id,
             'price' => $this->price,
         ];
     }
