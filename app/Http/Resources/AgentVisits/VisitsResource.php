@@ -40,7 +40,7 @@ class VisitsResource extends JsonResource
             'scanPackProducts' => ScanPackProductResource::collection($this->whenLoaded('scanPackProducts')),
             'scanPromotionProducts' => ScanPromotionProductResource::collection($this->whenLoaded('scanPromotionProducts')),
             'posMs' => PosmResource::collection($this->whenLoaded('posMs')),
-            'productPrices' => ProductPriceResource::collection($this->whenLoaded('productPrices')),
+            'productPrices' => ProductPriceResource::collection($this->whenLoaded('productPrices.Product')),
 
 
         ];
