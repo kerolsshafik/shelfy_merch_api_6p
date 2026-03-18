@@ -17,7 +17,7 @@ class ShelfPercentageRequest extends FormRequest
             'visit_id' => 'required|exists:visits,id',
             'store_id' => 'required|exists:stores,id',
             'categories' => 'required|array|min:1',
-            'categories.*.category_id' => 'required|exists:product_categories,category_id',
+            'categories.*.category_id' => 'required|exists:product_categories,id',
             'categories.*.percentage' => 'required|numeric|min:0|max:100',
         ];
     }

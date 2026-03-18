@@ -482,7 +482,7 @@ class AgentVisitsController extends Controller
 
         $inputCategories = collect($request->input('categories', []));
         $categoryIds = $inputCategories->pluck('category_id')->unique();
-        $categories = Category::whereIn('category_id', $categoryIds)->get()->keyBy('category_id');
+        $categories = Category::whereIn('id', $categoryIds)->get()->keyBy('id');
 
         $missing = $categoryIds->diff($categories->keys());
         if ($missing->isNotEmpty()) {
