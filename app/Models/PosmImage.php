@@ -9,6 +9,8 @@ class PosmImage extends Model
 {
     use HasFactory;
 
+    protected $table = 'pos_m_images';
+
     protected $fillable = ['pos_m_id', 'image_path'];
 
     public function posm()
