@@ -54,8 +54,10 @@ class CategoryController extends Controller
         $user_id = Auth::id();
         $store_id = $request->store_id ?? 1;
         $categoryIds = \DB::table('category_customer')->where('customer_id', $store_id)->pluck('category_id')->toArray();
-
-        $categories = Category::whereIn('category_id', $categoryIds)
+        // before
+        //    $categories = Category::whereIn('category_id', $categoryIds)
+        // after 
+        $categories = Category::whereIn('id', $categoryIds)
             ->whereNull('parent')
             ->where('active', 1)
             ->with([
@@ -125,7 +127,10 @@ class CategoryController extends Controller
         })
             ->whereNull('parent')
             ->where('active', 1)
-            ->whereIn('category_id', $categoryIds)
+            // before
+            // ->whereIn('category_id', $categoryIds) 
+            // after
+            ->whereIn('id', $categoryIds)
             ->with([
                 'children' => function ($query) {
                     $query->when(App::getLocale() == 'en', function ($query) {
