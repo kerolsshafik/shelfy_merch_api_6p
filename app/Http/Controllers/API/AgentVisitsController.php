@@ -269,7 +269,7 @@ class AgentVisitsController extends Controller
             'scanPromotionProducts.variation',
             'osaVisits',
             'productPrices.product',
-            'shelfPercentage',
+            'shelfPercentage.category',
         ])->where('id', $request->visit_id)->first();
         $resource = new VisitsResource($visit);
         return $this->successResponse($resource, 'Visit data returned successfully');
@@ -482,7 +482,7 @@ class AgentVisitsController extends Controller
 
         $inputCategories = collect($request->input('categories', []));
         $categoryIds = $inputCategories->pluck('category_id')->unique();
-        $categories = Category::whereIn('id', $categoryIds)->get()->keyBy('id');
+        $categories = Category::whereIn('category_id', $categoryIds)->get()->keyBy('category_id');
 
         $missing = $categoryIds->diff($categories->keys());
         if ($missing->isNotEmpty()) {
