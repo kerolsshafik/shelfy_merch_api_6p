@@ -381,6 +381,12 @@ class AgentVisitsController extends Controller
         if (!$product) {
             return $this->errorResponse('Product not found', 404);
         }
+        $sanPackProduct = ScanPackProduct::where('product_id', $variation->product_id)
+            ->where('store_id', $request->store_id)
+            ->where('visit_id', $visit->id)->first();
+        if ($sanPackProduct) {
+            return $this->errorResponse('Pack product already scanned', 422);
+        }
 
         ScanPackProduct::create([
             'visit_id' => $visit->id,
@@ -389,6 +395,7 @@ class AgentVisitsController extends Controller
             'product_variation_id' => $variation->id,
             'barcode' => $barcode,
         ]);
+
 
         return $this->successResponse([
             'is_pack' => true,
@@ -453,6 +460,12 @@ class AgentVisitsController extends Controller
         $product = Product::with(['standard', 'category'])->find($variation->product_id);
         if (!$product) {
             return $this->errorResponse('Product not found', 404);
+        }
+        $sanPackProduct = ScanPromotionProduct::where('product_id', $variation->product_id)
+            ->where('store_id', $request->store_id)
+            ->where('visit_id', $visit->id)->first();
+        if ($sanPackProduct) {
+            return $this->errorResponse('Pack product already scanned', 422);
         }
 
         ScanPromotionProduct::create([
