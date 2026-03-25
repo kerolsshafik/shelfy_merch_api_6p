@@ -19,6 +19,7 @@ class CategoriesResource extends JsonResource
             'name' => $this->title,
             'name_ar' => $this->name_ar,
             'category_id' => $this->category_id,
+            'image' => $this->image ?? '',
 
         ];
     }
