@@ -37,7 +37,7 @@ class ProductController extends Controller
         $store = Store::where('id', $request->category_id)->first();
         // dd($result);
         $isPack = PackProduct::where('product_id', $prod->product_id)
-            ->where('is_pack', 1)
+            ->where('is_price', 1)
             ->exists();
 
         $cat = Product::where('products.id', $prod->product_id)
@@ -98,7 +98,7 @@ class ProductController extends Controller
                 return $this->errorResponse($message, 401, null);
             }
             $message = App::getLocale() == 'en' ? 'Product returned successfully' : 'تمت إعادة المنتج بنجاح';
-            $data->is_pack = $isPack;
+            $data->is_price = $isPack;
             return $this->successResponse($data, $message);
         }
 

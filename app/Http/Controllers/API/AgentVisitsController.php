@@ -313,11 +313,11 @@ class AgentVisitsController extends Controller
         }
 
         $isPack = PackProduct::where('product_id', $variation->product_id)
-            ->where('is_pack', 1)
+            ->where('is_price', 1)
             ->exists();
 
         if (!$isPack) {
-            return $this->errorResponse('This product is not a pack', 404);
+            return $this->errorResponse('This product is not in a pack', 404);
         }
 
 
