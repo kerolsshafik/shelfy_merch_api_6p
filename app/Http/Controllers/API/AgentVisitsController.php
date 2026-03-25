@@ -334,6 +334,28 @@ class AgentVisitsController extends Controller
 
         return $this->successResponse($price, 'Visit product price saved successfully', 200);
     }
+    // removeVisitProductPrice
+    public function removeVisitProductPrice(Request $request)
+    {
+        $visit = Visit::where('id', $request->visit_id)->first();
+        if (!$visit) {
+            return $this->errorResponse('Visit not found', 404);
+        }
+
+        if ((int) $visit->store_id !== (int) $request->store_id) {
+            return $this->errorResponse('store_id does not match this visit', 422);
+        }
+
+        $price = VisitProductPrice::where('visit_id', $request->visit_id)
+            ->where('store_id', $request->store_id)
+            ->where('product_id', $request->product_id)
+            ->delete();
+        if ($price) {
+            return $this->successResponse($price, 'Visit product price removed successfully', 200);
+        } else {
+            return $this->errorResponse('Visit product price not found', 404);
+        }
+    }
 
     public function scan(Request $request)
     {

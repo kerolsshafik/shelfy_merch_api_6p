@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\PackProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -35,9 +36,12 @@ class ProductController extends Controller
         $result = get_category_id([$product_category->productcategory_id]);
         $store = Store::where('id', $request->category_id)->first();
         // dd($result);
+        $isPack = PackProduct::where('product_id', $prod->product_id)
+            ->where('is_pack', 1)
+            ->exists();
 
-        $cat=Product::where('products.id', $prod->product_id)
-                ->whereIn('productcategory_id', $result)->with([
+        $cat = Product::where('products.id', $prod->product_id)
+            ->whereIn('productcategory_id', $result)->with([
                     'category.productOsa' => function ($q) use ($store) {
                         $q->where('segment', $store->segment)->select('category_id');
                     }
@@ -94,6 +98,7 @@ class ProductController extends Controller
                 return $this->errorResponse($message, 401, null);
             }
             $message = App::getLocale() == 'en' ? 'Product returned successfully' : 'تمت إعادة المنتج بنجاح';
+            $data->is_pack = $isPack;
             return $this->successResponse($data, $message);
         }
 
