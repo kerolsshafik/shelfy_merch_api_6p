@@ -345,10 +345,14 @@ class AgentVisitsController extends Controller
         if ((int) $visit->store_id !== (int) $request->store_id) {
             return $this->errorResponse('store_id does not match this visit', 422);
         }
+        $variation = ProductVariation::where('barcode', $request->barcode)->first();
+        if (!$variation) {
+            return $this->errorResponse('Barcode not found', 404);
+        }
 
         $price = VisitProductPrice::where('visit_id', $request->visit_id)
             ->where('store_id', $request->store_id)
-            ->where('product_id', $request->product_id)
+            ->where('product_id', $variation->product_id)
             ->delete();
         if ($price) {
             return $this->successResponse($price, 'Visit product price removed successfully', 200);
