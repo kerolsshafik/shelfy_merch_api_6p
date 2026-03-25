@@ -16,6 +16,7 @@ use App\Http\Requests\AgentVisits\VisitReturnsRequest;
 use App\Http\Resources\AgentVisits\VisitOsaResource;
 use App\Http\Resources\AgentVisits\VisitReturnsResource;
 use App\Http\Resources\AgentVisits\VisitsResource;
+use App\Http\Resources\Categories\CategoriesResource;
 use App\Http\Resources\Products\ProductResource;
 use App\Models\Category;
 use App\Models\PackProduct;
@@ -347,7 +348,10 @@ class AgentVisitsController extends Controller
         if (!$product) {
             return $this->errorResponse('Product not found', 404);
         }
-        return $this->successResponse($product, 'Product returned successfully', 200);
+
+        $data = new ProductResource($product);
+
+        return $this->successResponse($data, 'Product returned successfully', 200);
     }
 
 
